@@ -1,0 +1,77 @@
+{
+  "framework": {
+    "name": "多技能框架系统",
+    "version": "1.0.0",
+    "description": "具备多个skills能力的智能框架，用于执行不同的任务",
+    "author": "Skills Framework Team",
+    "created_date": "2025-03-12"
+  },
+  "skills": {
+    "directory": "skills",
+    "auto_load": true,
+    "default_skills": [
+      "priority_sorter",
+      "time_analyzer"
+    ]
+  },
+  "user_preferences": {
+    "language": "zh-CN",
+    "theme": "default",
+    "auto_save": true,
+    "save_interval": 300,
+    "max_history_records": 1000
+  },
+  "priority_rules": {
+    "weights": {
+      "urgency": 0.30,
+      "importance": 0.35,
+      "effort": 0.20,
+      "deadline": 0.15
+    },
+    "categories": {
+      "紧急重要": {
+        "min_score": 0.80,
+        "color": "#ff4444",
+        "description": "需要立即处理的重要任务"
+      },
+      "重要不紧急": {
+        "min_score": 0.60,
+        "color": "#ffaa00", 
+        "description": "重要但可以稍后处理的任务"
+      },
+      "紧急不重要": {
+        "min_score": 0.40,
+        "color": "#44aa44",
+        "description": "紧急但不重要的任务"
+      },
+      "不紧急不重要": {
+        "min_score": 0.00,
+        "color": "#888888",
+        "description": "可以推迟或委托的任务"
+      }
+    }
+  },
+  "time_analysis": {
+    "efficiency_thresholds": {
+      "high": 0.8,
+      "medium": 0.6,
+      "low": 0.4
+    },
+    "working_hours": {
+      "start": "09:00",
+      "end": "18:00",
+      "focus_periods": ["09:00-11:00", "14:00-16:00"]
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "framework.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  },
+  "backup": {
+    "auto_backup": true,
+    "backup_interval": 86400,
+    "max_backups": 30
+  }
+}

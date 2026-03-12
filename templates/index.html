@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-line"></i> 系统概览</h2>
+    <span class="text-muted">最后更新: {{ summary.last_updated[:16].replace('T', ' ') }}</span>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5><i class="fas fa-calendar-check text-primary"></i> 习惯总数</h5>
+            <h3 class="text-primary">{{ summary.total_habits }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5><i class="fas fa-user-tie text-success"></i> 工作方式</h5>
+            <h3 class="text-success">{{ summary.total_work_styles }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5><i class="fas fa-chess text-warning"></i> 决策记录</h5>
+            <h3 class="text-warning">{{ summary.total_decisions }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5><i class="fas fa-tasks text-info"></i> 任务完成率</h5>
+            <h3 class="text-info">{{ "%.1f"|format(summary.task_completion_rate * 100) }}%</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- 高优先级习惯 -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-star"></i> 高优先级习惯</h5>
+            </div>
+            <div class="card-body">
+                {% if high_priority_habits %}
+                    {% for habit in high_priority_habits %}
+                    <div class="habit-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6>{{ habit.name }}</h6>
+                            <span class="badge bg-primary">优先级: {{ habit.priority }}</span>
+                        </div>
+                        <p class="text-muted small">{{ habit.description }}</p>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">{{ habit.frequency }}</small>
+                            <small class="text-muted">成功率: {{ "%.1f"|format(habit.success_rate * 100) }}%</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">暂无高优先级习惯</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近决策 -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> 最近7天决策</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_decisions %}
+                    {% for decision in recent_decisions[:5] %}
+                    <div class="decision-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6>{{ decision.decision_type }}</h6>
+                            <span class="badge bg-{{ 'success' if decision.outcome == 'positive' else 'warning' if decision.outcome == 'neutral' else 'danger' }}">
+                                {{ '积极' if decision.outcome == 'positive' else '中性' if decision.outcome == 'neutral' else '消极' }}
+                            </span>
+                        </div>
+                        <p class="text-muted small">{{ decision.description[:100] }}...</p>
+                        <small class="text-muted">
+                            {{ decision.timestamp[:16].replace('T', ' ') }} | 
+                            信心度: {{ decision.confidence_level }}/10
+                        </small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">最近7天无决策记录</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- 待处理任务 -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clock"></i> 待处理任务 ({{ pending_tasks|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if pending_tasks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>任务标题</th>
+                                    <th>优先级</th>
+                                    <th>截止日期</th>
+                                    <th>预估时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in pending_tasks %}
+                                <tr>
+                                    <td>{{ task.title }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if task.priority == 'urgent' else 'warning' if task.priority == 'high' else 'info' if task.priority == 'medium' else 'secondary' }}">
+                                            {{ task.priority }}
+                                        </span>
+                                    </td>
+                                    <td>{{ task.deadline }}</td>
+                                    <td>{{ task.estimated_hours }}小时</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if task.status == 'in_progress' else 'secondary' }}">
+                                            {{ '进行中' if task.status == 'in_progress' else '待处理' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">暂无待处理任务</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 快速操作 -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> 快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="btn-group" role="group">
+                    <a href="/habits" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> 添加习惯
+                    </a>
+                    <a href="/tasks" class="btn btn-outline-success">
+                        <i class="fas fa-plus"></i> 添加任务
+                    </a>
+                    <a href="/decisions" class="btn btn-outline-warning">
+                        <i class="fas fa-plus"></i> 记录决策
+                    </a>
+                    <a href="/work_styles" class="btn btn-outline-info">
+                        <i class="fas fa-plus"></i> 记录工作方式
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{
+  "habits": [
+    {
+      "name": "晨间阅读",
+      "description": "每天早晨阅读技术文章30分钟",
+      "frequency": "daily",
+      "priority": 8,
+      "created_at": "2026-03-12T14:40:19.093439",
+      "last_practiced": "2026-03-12T14:40:19.093455",
+      "success_rate": 0.0
+    },
+    {
+      "name": "代码审查",
+      "description": "每周进行代码审查和总结",
+      "frequency": "weekly",
+      "priority": 7,
+      "created_at": "2026-03-12T14:40:19.093884",
+      "last_practiced": "2026-03-12T14:40:19.093888",
+      "success_rate": 0.0
+    }
+  ],
+  "work_styles": [
+    {
+      "category": "工作习惯",
+      "description": "喜欢先规划再执行，使用番茄工作法",
+      "effectiveness": 8,
+      "preferred_tools": [
+        "VS Code",
+        "Git",
+        "任务管理工具"
+      ],
+      "working_hours": {
+        "morning": "9:00-12:00",
+        "afternoon": "14:00-18:00"
+      },
+      "created_at": "2026-03-12T14:40:19.094212"
+    }
+  ],
+  "decisions": [
+    {
+      "decision_type": "技术决策",
+      "description": "选择使用Python而不是Java进行新项目开发",
+      "factors_considered": [
+        "开发效率",
+        "团队熟悉度",
+        "项目需求"
+      ],
+      "outcome": "positive",
+      "confidence_level": 8,
+      "timestamp": "2026-03-12T14:40:19.094613",
+      "lessons_learned": "Python在快速原型开发方面更有优势"
+    }
+  ],
+  "tasks": [
+    {
+      "title": "完成记忆系统开发",
+      "description": "实现记忆系统的核心功能",
+      "priority": "high",
+      "status": "pending",
+      "deadline": "2024-03-15",
+      "estimated_hours": 4.0,
+      "actual_hours": null,
+      "created_at": "2026-03-12T14:40:19.094956",
+      "completed_at": null,
+      "tags": [
+        "开发",
+        "Python"
+      ]
+    }
+  ],
+  "last_updated": "2026-03-12T14:40:19.094981"
+}

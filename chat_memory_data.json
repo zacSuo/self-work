@@ -1,0 +1,60 @@
+{
+  "conversations": [
+    {
+      "timestamp": "2026-03-12T14:59:48.040015",
+      "user_input": "我管理一个20人的研发团队，用于进行特定清洁机器人的研发工作，当前的团队包括软硬件和算法，算法需要进行运动控制和轨迹规划，请帮忙进行团队分析，看看哪个团队是核心的",
+      "system_response": "",
+      "analysis": {
+        "type": "decision",
+        "topics": [],
+        "habits": [],
+        "decisions": [
+          {
+            "text": "需要进行运动控制和轨迹规划，请帮忙进行团队分析，看看哪个团队是核心的",
+            "type": "general",
+            "confidence": 0.6
+          }
+        ],
+        "tasks": [],
+        "sentiment": "neutral"
+      },
+      "summary": "用户在进行决策讨论; 涉及 1 个决策点"
+    },
+    {
+      "timestamp": "2026-03-12T15:00:03.957572",
+      "user_input": "你能帮我做什么",
+      "system_response": "",
+      "analysis": {
+        "type": "general",
+        "topics": [],
+        "habits": [],
+        "decisions": [],
+        "tasks": [],
+        "sentiment": "neutral"
+      },
+      "summary": "常规对话交流"
+    }
+  ],
+  "habits": [],
+  "work_styles": [],
+  "decisions": [
+    {
+      "type": "general",
+      "description": "需要进行运动控制和轨迹规划，请帮忙进行团队分析，看看哪个团队是核心的",
+      "context": "我管理一个20人的研发团队，用于进行特定清洁机器人的研发工作，当前的团队包括软硬件和算法，算法需要进行运动控制和轨迹规划，请帮忙进行团队分析，看看哪个团队是核心的",
+      "timestamp": "2026-03-12T14:59:48.040065",
+      "confidence": 0.6
+    }
+  ],
+  "tasks": [],
+  "user_profile": {
+    "conversation_count": 2,
+    "preferred_topics": {
+      "decision": 1
+    },
+    "sentiment_trend": {
+      "neutral": 2
+    },
+    "last_updated": "2026-03-12T15:00:03.957592"
+  }
+}

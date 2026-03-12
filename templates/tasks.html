@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tasks"></i> 任务安排</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+        <i class="fas fa-plus"></i> 添加任务
+    </button>
+</div>
+
+<!-- 任务统计 -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5>总任务数</h5>
+            <h3 class="text-primary">{{ tasks|length }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5>待处理任务</h5>
+            <h3 class="text-warning">{{ pending_tasks|length }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5>已完成任务</h5>
+            {% set completed_tasks = tasks|selectattr('status', 'equalto', 'completed')|list %}
+            <h3 class="text-success">{{ completed_tasks|length }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h5>完成率</h5>
+            <h3 class="text-info">{{ "%.1f"|format(completed_tasks|length / tasks|length * 100) if tasks else 0 }}%</h3>
+        </div>
+    </div>
+</div>
+
+<!-- 待处理任务 -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-clock"></i> 待处理任务 ({{ pending_tasks|length }})</h5>
+    </div>
+    <div class="card-body">
+        {% if pending_tasks %}
+            <div class="row">
+                {% for task in pending_tasks|sort(attribute='priority', reverse=true) %}
+                <div class="col-md-6 mb-3">
+                    <div class="card task-card priority-{{ 'high' if task.priority == 'urgent' or task.priority == 'high' else 'medium' if task.priority == 'medium' else 'low' }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title">{{ task.title }}</h5>
+                                <span class="badge bg-{{ 'danger' if task.priority == 'urgent' else 'warning' if task.priority == 'high' else 'info' if task.priority == 'medium' else 'secondary' }}">
+                                    {{ task.priority }}
+                                </span>
+                            </div>
+                            
+                            <p class="card-text text-muted">{{ task.description }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> 预估: {{ task.estimated_hours }}小时
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> 截止: {{ task.deadline }}
+                                </small>
+                            </div>
+                            
+                            {% if task.tags %}
+                            <div class="mb-2">
+                                {% for tag in task.tags %}
+                                <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary" onclick="updateTaskStatus('{{ task.title }}', 'in_progress')">
+                                    <i class="fas fa-play"></i> 开始
+                                </button>
+                                <button class="btn btn-sm btn-success" onclick="completeTask('{{ task.title }}')">
+                                    <i class="fas fa-check"></i> 完成
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="updateTaskStatus('{{ task.title }}', 'cancelled')">
+                                    <i class="fas fa-times"></i> 取消
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">暂无待处理任务</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 所有任务列表 -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list"></i> 所有任务</h5>
+    </div>
+    <div class="card-body">
+        {% if tasks %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>任务标题</th>
+                            <th>优先级</th>
+                            <th>状态</th>
+                            <th>截止日期</th>
+                            <th>预估/实际时间</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks|sort(attribute='created_at', reverse=true) %}
+                        <tr>
+                            <td>
+                                <strong>{{ task.title }}</strong><br>
+                                <small class="text-muted">{{ task.description[:50] }}{% if task.description|length > 50 %}...{% endif %}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'danger' if task.priority == 'urgent' else 'warning' if task.priority == 'high' else 'info' if task.priority == 'medium' else 'secondary' }}">
+                                    {{ task.priority }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if task.status == 'completed' else 'primary' if task.status == 'in_progress' else 'secondary' if task.status == 'pending' else 'dark' }}">
+                                    {{ '已完成' if task.status == 'completed' else '进行中' if task.status == 'in_progress' else '待处理' if task.status == 'pending' else '已取消' }}
+                                </span>
+                            </td>
+                            <td>{{ task.deadline }}</td>
+                            <td>
+                                {{ task.estimated_hours }}小时
+                                {% if task.actual_hours %}
+                                    <br><small class="text-muted">实际: {{ task.actual_hours }}小时</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at[:10] }}</td>
+                            <td>
+                                {% if task.status == 'pending' %}
+                                <button class="btn btn-sm btn-primary" onclick="updateTaskStatus('{{ task.title }}', 'in_progress')">开始</button>
+                                <button class="btn btn-sm btn-success" onclick="completeTask('{{ task.title }}')">完成</button>
+                                {% elif task.status == 'in_progress' %}
+                                <button class="btn btn-sm btn-success" onclick="completeTask('{{ task.title }}')">完成</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 暂无任务记录，请添加您的第一个任务。
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 添加任务模态框 -->
+<div class="modal fade" id="addTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加新任务</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addTaskForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="taskTitle" class="form-label">任务标题</label>
+                        <input type="text" class="form-control" id="taskTitle" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">任务描述</label>
+                        <textarea class="form-control" id="taskDescription" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="taskPriority" class="form-label">优先级</label>
+                                <select class="form-select" id="taskPriority" name="priority" required>
+                                    <option value="low">低</option>
+                                    <option value="medium" selected>中</option>
+                                    <option value="high">高</option>
+                                    <option value="urgent">紧急</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="taskDeadline" class="form-label">截止日期</label>
+                                <input type="date" class="form-control" id="taskDeadline" name="deadline" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="taskEstimatedHours" class="form-label">预估时间 (小时)</label>
+                                <input type="number" class="form-control" id="taskEstimatedHours" 
+                                       name="estimated_hours" min="0.5" step="0.5" value="2" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="taskTags" class="form-label">标签 (用逗号分隔)</label>
+                                <input type="text" class="form-control" id="taskTags" name="tags"
+                                       placeholder="例如: 开发, 学习, 工作, 个人...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加任务</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 完成任务模态框 -->
+<div class="modal fade" id="completeTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">完成任务</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="completeTaskForm">
+                <input type="hidden" id="completeTaskTitle" name="title">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="actualHours" class="form-label">实际花费时间 (小时)</label>
+                        <input type="number" class="form-control" id="actualHours" name="actual_hours" 
+                               min="0.5" step="0.5" placeholder="请输入实际花费的时间">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">确认完成</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 设置默认截止日期为明天
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('taskDeadline').value = tomorrow.toISOString().split('T')[0];
+
+    // 添加任务表单提交
+    document.getElementById('addTaskForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        makeAjaxRequest('/add_task', formData, function(result) {
+            $('#addTaskModal').modal('hide');
+            this.reset();
+        }.bind(this));
+    });
+
+    // 完成任务表单提交
+    document.getElementById('completeTaskForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        formData.append('status', 'completed');
+        
+        makeAjaxRequest('/update_task_status', formData, function(result) {
+            $('#completeTaskModal').modal('hide');
+            this.reset();
+        }.bind(this));
+    });
+
+    // 更新任务状态
+    function updateTaskStatus(taskTitle, status) {
+        const formData = new FormData();
+        formData.append('title', taskTitle);
+        formData.append('status', status);
+        
+        makeAjaxRequest('/update_task_status', formData, function(result) {
+            // 页面会自动刷新
+        });
+    }
+
+    // 完成任务（弹出时间输入框）
+    function completeTask(taskTitle) {
+        document.getElementById('completeTaskTitle').value = taskTitle;
+        $('#completeTaskModal').modal('show');
+    }
+</script>
+{% endblock %}

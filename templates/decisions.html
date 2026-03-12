@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chess"></i> 决策记录</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recordDecisionModal">
+        <i class="fas fa-plus"></i> 记录决策
+    </button>
+</div>
+
+<!-- 决策统计 -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h5>总决策数</h5>
+            <h3 class="text-primary">{{ decisions|length }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h5>最近7天决策</h5>
+            <h3 class="text-success">{{ recent_decisions|length }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h5>积极决策率</h5>
+            {% set positive_decisions = decisions|selectattr('outcome', 'equalto', 'positive')|list %}
+            <h3 class="text-warning">{{ "%.1f"|format(positive_decisions|length / decisions|length * 100) if decisions else 0 }}%</h3>
+        </div>
+    </div>
+</div>
+
+<!-- 决策列表 -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list"></i> 决策记录列表</h5>
+    </div>
+    <div class="card-body">
+        {% if decisions %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>决策类型</th>
+                            <th>描述</th>
+                            <th>考虑因素</th>
+                            <th>结果</th>
+                            <th>信心度</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for decision in decisions|sort(attribute='timestamp', reverse=true) %}
+                        <tr>
+                            <td>{{ decision.decision_type }}</td>
+                            <td>
+                                <span title="{{ decision.description }}">
+                                    {{ decision.description[:50] }}{% if decision.description|length > 50 %}...{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% for factor in decision.factors_considered[:3] %}
+                                    <span class="badge bg-secondary me-1">{{ factor }}</span>
+                                {% endfor %}
+                                {% if decision.factors_considered|length > 3 %}
+                                    <span class="badge bg-light text-dark">+{{ decision.factors_considered|length - 3 }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if decision.outcome == 'positive' else 'warning' if decision.outcome == 'neutral' else 'danger' }}">
+                                    {{ '积极' if decision.outcome == 'positive' else '中性' if decision.outcome == 'neutral' else '消极' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress" style="width: 80px; height: 20px;">
+                                    <div class="progress-bar bg-{{ 'success' if decision.confidence_level >= 8 else 'warning' if decision.confidence_level >= 5 else 'danger' }}" 
+                                         style="width: {{ decision.confidence_level * 10 }}%">
+                                        {{ decision.confidence_level }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ decision.timestamp[:16].replace('T', ' ') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 暂无决策记录，请记录您的第一个决策。
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 记录决策模态框 -->
+<div class="modal fade" id="recordDecisionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">记录新决策</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="recordDecisionForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="decisionType" class="form-label">决策类型</label>
+                                <select class="form-select" id="decisionType" name="decision_type" required>
+                                    <option value="">请选择类型</option>
+                                    <option value="工作决策">工作决策</option>
+                                    <option value="技术决策">技术决策</option>
+                                    <option value="生活决策">生活决策</option>
+                                    <option value="投资决策">投资决策</option>
+                                    <option value="学习决策">学习决策</option>
+                                    <option value="团队决策">团队决策</option>
+                                    <option value="项目决策">项目决策</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="decisionOutcome" class="form-label">决策结果</label>
+                                <select class="form-select" id="decisionOutcome" name="outcome" required>
+                                    <option value="positive">积极</option>
+                                    <option value="neutral">中性</option>
+                                    <option value="negative">消极</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="decisionDescription" class="form-label">决策描述</label>
+                        <textarea class="form-control" id="decisionDescription" name="description" 
+                                  rows="3" placeholder="请详细描述决策的内容和背景..." required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="decisionFactors" class="form-label">考虑因素 (用逗号分隔)</label>
+                        <input type="text" class="form-control" id="decisionFactors" name="factors"
+                               placeholder="例如: 成本, 时间, 风险, 团队能力, 技术可行性..." required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="decisionConfidence" class="form-label">信心度 (1-10)</label>
+                                <input type="number" class="form-control" id="decisionConfidence" 
+                                       name="confidence" min="1" max="10" value="7" required>
+                                <div class="form-text">1表示非常不确定，10表示非常确定</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="decisionLessons" class="form-label">经验教训</label>
+                        <textarea class="form-control" id="decisionLessons" name="lessons" 
+                                  rows="3" placeholder="从这次决策中学到了什么？有什么可以改进的地方？"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">记录决策</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 记录决策表单提交
+    document.getElementById('recordDecisionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        makeAjaxRequest('/record_decision', formData, function(result) {
+            $('#recordDecisionModal').modal('hide');
+            this.reset();
+        }.bind(this));
+    });
+</script>
+{% endblock %}

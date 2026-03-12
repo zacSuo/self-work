@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-check"></i> 习惯管理</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+        <i class="fas fa-plus"></i> 添加习惯
+    </button>
+</div>
+
+<!-- 习惯列表 -->
+<div class="row">
+    {% if habits %}
+        {% for habit in habits %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card habit-card priority-{{ 'high' if habit.priority >= 8 else 'medium' if habit.priority >= 5 else 'low' }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title">{{ habit.name }}</h5>
+                        <span class="badge bg-{{ 'danger' if habit.priority >= 8 else 'warning' if habit.priority >= 5 else 'success' }}">
+                            优先级: {{ habit.priority }}
+                        </span>
+                    </div>
+                    
+                    <p class="card-text text-muted">{{ habit.description }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-sync-alt"></i> {{ habit.frequency }}
+                        </small>
+                        <small class="text-muted">
+                            成功率: {{ "%.1f"|format(habit.success_rate * 100) }}%
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            创建: {{ habit.created_at[:10] }}
+                        </small>
+                        <small class="text-muted">
+                            最后实践: {{ habit.last_practiced[:10] }}
+                        </small>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-success" onclick="markHabitPractice('{{ habit.name }}', true)">
+                            <i class="fas fa-check"></i> 完成
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="markHabitPractice('{{ habit.name }}', false)">
+                            <i class="fas fa-times"></i> 未完成
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 暂无习惯记录，请添加您的第一个习惯。
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 添加习惯模态框 -->
+<div class="modal fade" id="addHabitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加新习惯</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addHabitForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="habitName" class="form-label">习惯名称</label>
+                        <input type="text" class="form-control" id="habitName" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="habitDescription" class="form-label">习惯描述</label>
+                        <textarea class="form-control" id="habitDescription" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="habitFrequency" class="form-label">执行频率</label>
+                        <select class="form-select" id="habitFrequency" name="frequency" required>
+                            <option value="daily">每日</option>
+                            <option value="weekly">每周</option>
+                            <option value="monthly">每月</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="habitPriority" class="form-label">优先级 (1-10)</label>
+                        <input type="number" class="form-control" id="habitPriority" name="priority" 
+                               min="1" max="10" value="5" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加习惯</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 添加习惯表单提交
+    document.getElementById('addHabitForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        makeAjaxRequest('/add_habit', formData, function(result) {
+            $('#addHabitModal').modal('hide');
+            this.reset();
+        }.bind(this));
+    });
+
+    // 标记习惯实践
+    function markHabitPractice(habitName, success) {
+        const formData = new FormData();
+        formData.append('habit_name', habitName);
+        formData.append('success', success);
+        
+        makeAjaxRequest('/update_habit_practice', formData, function(result) {
+            // 页面会自动刷新
+        });
+    }
+</script>
+{% endblock %}

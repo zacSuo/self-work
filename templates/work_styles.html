@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-tie"></i> 工作方式记录</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkStyleModal">
+        <i class="fas fa-plus"></i> 添加工作方式
+    </button>
+</div>
+
+<!-- 工作方式列表 -->
+<div class="row">
+    {% if work_styles %}
+        {% for style in work_styles %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title">{{ style.category }}</h5>
+                        <span class="badge bg-{{ 'success' if style.effectiveness >= 8 else 'warning' if style.effectiveness >= 5 else 'danger' }}">
+                            有效性: {{ style.effectiveness }}/10
+                        </span>
+                    </div>
+                    
+                    <p class="card-text">{{ style.description }}</p>
+                    
+                    <div class="mb-2">
+                        <strong>常用工具:</strong>
+                        <div>
+                            {% for tool in style.preferred_tools %}
+                            <span class="badge bg-secondary me-1">{{ tool }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>工作时间:</strong>
+                        <div class="small text-muted">
+                            {% for period, time in style.working_hours.items() %}
+                                {% if time %}
+                                <span>{{ period }}: {{ time }}</span><br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <small class="text-muted">
+                        创建时间: {{ style.created_at[:16].replace('T', ' ') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 暂无工作方式记录，请添加您的工作习惯和方式。
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 添加工作方式模态框 -->
+<div class="modal fade" id="addWorkStyleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">记录工作方式</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addWorkStyleForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="workStyleCategory" class="form-label">分类</label>
+                                <select class="form-select" id="workStyleCategory" name="category" required>
+                                    <option value="">请选择分类</option>
+                                    <option value="工作习惯">工作习惯</option>
+                                    <option value="沟通方式">沟通方式</option>
+                                    <option value="决策模式">决策模式</option>
+                                    <option value="时间管理">时间管理</option>
+                                    <option value="学习方式">学习方式</option>
+                                    <option value="团队协作">团队协作</option>
+                                    <option value="问题解决">问题解决</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="workStyleEffectiveness" class="form-label">有效性评分 (1-10)</label>
+                                <input type="number" class="form-control" id="workStyleEffectiveness" 
+                                       name="effectiveness" min="1" max="10" value="7" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="workStyleDescription" class="form-label">详细描述</label>
+                        <textarea class="form-control" id="workStyleDescription" name="description" 
+                                  rows="4" placeholder="请详细描述您的工作方式、习惯和偏好..." required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="workStyleTools" class="form-label">常用工具 (用逗号分隔)</label>
+                        <input type="text" class="form-control" id="workStyleTools" name="preferred_tools"
+                               placeholder="例如: VS Code, Git, Notion, 微信...">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="morningHours" class="form-label">上午工作时间</label>
+                                <input type="text" class="form-control" id="morningHours" name="morning_hours"
+                                       placeholder="例如: 9:00-12:00">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="afternoonHours" class="form-label">下午工作时间</label>
+                                <input type="text" class="form-control" id="afternoonHours" name="afternoon_hours"
+                                       placeholder="例如: 14:00-18:00">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="eveningHours" class="form-label">晚上工作时间</label>
+                                <input type="text" class="form-control" id="eveningHours" name="evening_hours"
+                                       placeholder="例如: 20:00-22:00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加记录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 添加工作方式表单提交
+    document.getElementById('addWorkStyleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        makeAjaxRequest('/add_work_style', formData, function(result) {
+            $('#addWorkStyleModal').modal('hide');
+            this.reset();
+        }.bind(this));
+    });
+</script>
+{% endblock %}
