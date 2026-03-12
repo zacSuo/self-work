@@ -1,0 +1,12 @@
+// 对话记忆数据文件（示例）
+// 原始文件已移动到 private_data/data/chat_memory_data.json
+// 请根据需要复制此文件并修改内容
+
+[
+  {
+    "timestamp": "2026-03-12T10:00:00",
+    "user_message": "用户消息示例",
+    "ai_response": "AI回复示例",
+    "summary": "对话摘要示例"
+  }
+]

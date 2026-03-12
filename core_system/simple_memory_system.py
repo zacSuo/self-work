@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional
 class SimpleMemorySystem:
     """简化的记忆系统"""
     
-    def __init__(self, storage_path: str = "simple_memory_data.json"):
+    def __init__(self, storage_path: str = "private_data/data/simple_memory_data.json"):
         self.storage_path = storage_path
         self.data = {
             'habits': [],

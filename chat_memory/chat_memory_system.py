@@ -15,7 +15,7 @@ import re
 class ChatMemorySystem:
     """对话式记忆系统"""
     
-    def __init__(self, storage_path: str = "chat_memory_data.json"):
+    def __init__(self, storage_path: str = "private_data/data/chat_memory_data.json"):
         self.storage_path = storage_path
         self.data = {
             'conversations': [],           # 对话记录

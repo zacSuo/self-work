@@ -1,0 +1,21 @@
+// 每日待办事项数据文件（示例）
+// 原始文件已移动到 private_data/data/daily_todos.json
+// 请根据需要复制此文件并修改内容
+
+{
+  "daily_todos": [
+    {
+      "date": "2026-03-12",
+      "day": "周四",
+      "available_hours": 6.8,
+      "tasks": [
+        {
+          "id": "task_001",
+          "description": "示例任务",
+          "priority": 0.8,
+          "estimated_hours": 1.0
+        }
+      ]
+    }
+  ]
+}

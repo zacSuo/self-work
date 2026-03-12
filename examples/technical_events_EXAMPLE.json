@@ -1,0 +1,17 @@
+// 技术事件记录文件（示例）
+// 原始文件已移动到 private_data/data/technical_events.json
+// 请根据需要复制此文件并修改内容
+
+[
+  {
+    "id": "EVENT_EXAMPLE_001",
+    "date": "2026-03-12",
+    "title": "技术问题解决方案示例",
+    "description": "这是一个示例技术事件记录",
+    "tags": [
+      "示例",
+      "技术"
+    ],
+    "importance": "medium"
+  }
+]

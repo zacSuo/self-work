@@ -11,7 +11,7 @@ from typing import Dict, List, Any
 class TechnicalEventRecorder:
     """技术事件记录器"""
     
-    def __init__(self, data_file="technical_events.json"):
+    def __init__(self, data_file="private_data/data/private_data/data/technical_events.json"):
         self.data_file = data_file
         self.events = self.load_events()
     

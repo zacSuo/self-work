@@ -64,7 +64,7 @@ class TaskRecord:
 class MemorySystem:
     """记忆系统主类"""
     
-    def __init__(self, storage_path: str = "memory_data.json"):
+    def __init__(self, storage_path: str = "private_data/data/memory_data.json"):
         self.storage_path = storage_path
         self.habits: List[HabitRecord] = []
         self.work_styles: List[WorkStyleRecord] = []

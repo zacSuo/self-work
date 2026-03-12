@@ -9,7 +9,7 @@ import os
 def record_today_event():
     """记录今天的J30S机器人底盘积尘解决方案事件"""
     
-    data_file = "technical_events.json"
+    data_file = "private_data/data/private_data/data/technical_events.json"
     
     # 加载现有事件
     if os.path.exists(data_file):

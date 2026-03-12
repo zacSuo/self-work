@@ -1,0 +1,15 @@
+// 每周会议数据文件（示例）
+// 原始文件已移动到 private_data/data/weekly_meeting_data.json
+// 请根据需要复制此文件并修改内容
+
+{
+  "meetings": [
+    {
+      "day": "周一",
+      "name": "项目站会示例",
+      "time": "09:30-10:00",
+      "duration": "0.5小时",
+      "priority": "中"
+    }
+  ]
+}

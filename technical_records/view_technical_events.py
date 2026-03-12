@@ -8,7 +8,7 @@ import os
 
 def load_events():
     """加载事件数据"""
-    data_file = "technical_events.json"
+    data_file = "private_data/data/private_data/data/technical_events.json"
     if os.path.exists(data_file):
         with open(data_file, 'r', encoding='utf-8') as f:
             return json.load(f)

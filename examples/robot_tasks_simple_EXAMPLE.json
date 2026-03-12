@@ -1,0 +1,7 @@
+# robot_tasks_simple.json 示例文件
+# 原始文件已移动到 private_data/data/robot_tasks_simple.json
+# 请根据需要创建实际数据
+
+{
+  "note": "这是一个示例文件，实际数据已移动到private_data目录"
+}

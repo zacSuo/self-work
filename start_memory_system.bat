@@ -1,6 +1,0 @@
-@echo off
-echo 启动对话式记忆系统...
-cd /d "d:\code\workbuddy"
-python chat_memory_system.py
-echo 系统已启动，正在后台运行...
-pause
